@@ -105,29 +105,49 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
     </div>
 
     <script>
-      var iterator = 0;
+      var iteratorEntablature = 0;
+      var iteratorLastTriglyphs = 0;
+      var iteratorLastCol = 0;
       var scene = new THREE.Scene();
       var entablatureResult = null;
+      var doricFriseResult = null;
+      var doricTriglyphResult = [];
+      var columnResult = [];
       setUp(scene);
-      generate3dTemple(0)
-      function generate3dTemple(iterateSign) {
-        if (iterateSign === 0) {
-          iterator = 0;
+      generate3dTemple(0, 0, 0)
+      function generate3dTemple(iterateSignEntablature, iterateSignLastTriglyphs, iterateSignLastCol) {
+        if (iterateSignEntablature === 0) {
+          iteratorEntablature = 0;
         }
-        if (iterateSign === +1) {
-          iterator = iterator + iterateSign;
+        if (iterateSignEntablature === +1) {
+          iteratorEntablature = iteratorEntablature + iterateSignEntablature;
         }
-        if (iterateSign === -1) {
-          iterator = iterator + iterateSign;
+        if (iterateSignEntablature === -1) {
+          iteratorEntablature = iteratorEntablature + iterateSignEntablature;
         }
-        drawArchitecturalElements(scene, iterator);
+        if (iterateSignLastTriglyphs === 0) {
+          iteratorLastTriglyphs = 0;
+        }
+        if (iterateSignLastTriglyphs === +1) {
+          iteratorLastTriglyphs = iteratorLastTriglyphs + iterateSignLastTriglyphs;
+        }
+        if (iterateSignLastTriglyphs === -1) {
+          iteratorLastTriglyphs = iteratorLastTriglyphs + iterateSignLastTriglyphs;
+        }
+        if (iterateSignLastCol === +1) {
+          iteratorLastCol = iteratorLastCol + iterateSignLastCol;
+        }
+        if (iterateSignLastCol === -1) {
+          iteratorLastCol = iteratorLastCol + iterateSignLastCol;
+        }
+        drawArchitecturalElements(scene, iteratorEntablature, iteratorLastTriglyphs, iteratorLastCol);
       }
 
       function calculateHeightAboveZeroYaxis(zeroYaxis, heightValue) {
         return heightValue - zeroYaxis
       }
 
-      function drawArchitecturalElements(scene, iterateSign) {
+      function drawArchitecturalElements(scene, iteratorEntablature, iteratorLastTriglyph, iteratorLastCol) {
         var idFactorRuleNumberColSide = document.getElementById('factorRuleNumberColLongSide').value
         var numberColShortSide = document.getElementById('numberColumnsFacade').value;
         var heightColumn = document.getElementById('heightColumn').value;
@@ -146,7 +166,6 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         compensatingHeightCol = compensatingHeightColArray[heightColumn];
         var distBetwColsCompensate = - podiumHeightCompensate
 
-        var columnResult = null;
         var lengthSide = 0;
         var widthSide = 0;
 
@@ -171,37 +190,31 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         }
 
         // FRONT
-        var widthAndLengthSide = createOneSideCol('north', numberColShortSide, false, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital, idFactorRuleNumberColSide, numberColShortSide, numberColLongSide, podiumHeight, podiumHeightCompensate, distBetwColsCompensate, scene);
+        var widthAndLengthSide = createOneSideCol('north', numberColShortSide, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital,podiumHeightCompensate, distBetwColsCompensate, scene, iteratorLastCol);
         widthSide = widthAndLengthSide[0];
         lengthSide = widthAndLengthSide[1]
 
-        var shortSideMetopesNumber = (numberColShortSide)*2 + 1;
-        var longSideMetopesNumber = (numberColLongSide)*2 + 1 // TODO
-        var allMetopesNumber = shortSideMetopesNumber*2 + longSideMetopesNumber*2
+        var shortSideMetopesNumber = (numberColShortSide)*2;
         var triglyphLength = 1;
 
-        var friseWidth = distBetwCols*numberColShortSide;
+        var friseWidth = (distBetwCols*numberColShortSide)-doricFriseHeight*4;
         var friseLength = distBetwCols*numberColLongSide;
 
-        createDoricFrise(friseWidth, friseLength, [shortSideMetopesNumber, longSideMetopesNumber, allMetopesNumber], triglyphLength, doricFriseHeight, compensatingCapitalHeight, thicknessColumn, distBetwCols, heightColumn, widthSide, lengthSide, idFactorRuleNumberColSide, numberColLongSide, distBetwColsCompensate, scene);
 
-/*        entablatureResult = drawEntablature(friseWidth, thicknessColumn*2, architraveHeight, doricFriseHeight);
-        // scene.add(entablatureResult);
-        // entablatureResult.position.z = 0;
-        entablatureResult.position.x = widthSide/2;
-        entablatureResult.position.y = parseInt(heightColumn) - 1 + compensatingCapitalHeight + doricFriseHeight/2;
-        scene.remove(entablatureResult)*/
+        createDoricFrise(shortSideMetopesNumber, triglyphLength, doricFriseHeight, compensatingCapitalHeight, thicknessColumn, distBetwCols, heightColumn, widthSide,distBetwColsCompensate, scene, 0+iteratorLastTriglyphs);
+
         scene.remove(entablatureResult)
-        entablatureResult = recreateEntablature(friseWidth+iterateSign, thicknessColumn*2, architraveHeight, doricFriseHeight, heightColumn, compensatingCapitalHeight, scene)
+        entablatureResult = createEntablature(avoidNegativeMeasurement(friseWidth+iteratorEntablature, iteratorEntablature), thicknessColumn, architraveHeight, doricFriseHeight, heightColumn, compensatingCapitalHeight, scene)
       }
 
-      function createOneSideCol(cardinalSide, numberCol, isLongSide = false, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital, idFactorRuleNumberColSide, numberColShortSide, numberColLongSide, podiumHeight, podiumHeightCompensate, distBetwColsCompensate, scene) {
-          var cardinalDirection = null;
+      function avoidNegativeMeasurement(measurement, iterateSign) {
+        if (measurement < 0) { return 0} else {return measurement};
+      }
 
-          if (cardinalSide === 'north' || cardinalSide === 'south') {
+      function createOneSideCol(cardinalSide, numberCol, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital, podiumHeightCompensate, distBetwColsCompensate, scene, compensateIncre = 0) {
+          var cardinalDirection = null;
+          if (cardinalSide === 'north') {
             cardinalDirection = 1;
-          } else if (cardinalSide === 'west' || cardinalSide === 'east') {
-            cardinalDirection = -1;
           }
 
           for (var iCol = 0; iCol < numberCol; iCol++) {
@@ -210,28 +223,83 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
             scene.add(columnResult[2]); // ECHINE
             scene.add(columnResult[1]); // ABAQUE
             if (cardinalDirection == 1 && cardinalSide === 'north') {
-              columnResult[0].position.x = cardinalDirection * iCol*distBetwCols;
+              columnResult[0].position.x = cardinalDirection * iCol*distBetwCols //+ compensateIncre;
               columnResult[0].position.y = heightColPosition + podiumHeightCompensate + distBetwColsCompensate + 0.25;
-              columnResult[2].position.x = cardinalDirection * iCol*distBetwCols;
+              columnResult[2].position.x = cardinalDirection * iCol*distBetwCols //+ compensateIncre;
               columnResult[2].position.y = heightColPosition-compensatingHeightCol + distBetwCols + podiumHeightCompensate ;
-              columnResult[1].position.x = cardinalDirection * iCol*distBetwCols;
+              columnResult[1].position.x = cardinalDirection * iCol*distBetwCols //+ compensateIncre;
               columnResult[1].position.y = heightColPosition-compensatingHeightCol+ distBetwCols + heightCapital + podiumHeightCompensate;
             }
 
             if (iCol == numberCol-1) {
               widthSide = iCol*distBetwCols
-              if (idFactorRuleNumberColSide == 'two_n_minus_one') {
-                lengthSide = widthSide
-              } else if (idFactorRuleNumberColSide == 'two_n') {
-                lengthSide = iCol*distBetwCols+distBetwCols/2
-              } else if (idFactorRuleNumberColSide == 'two_n_plus_one') {
-                lengthSide = iCol*distBetwCols+distBetwCols
-              }
+              lengthSide = widthSide
             }
           }
 
           return [widthSide, lengthSide];
       }
+
+/*            function createOneSideCol(cardinalSide, numberCol, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital, podiumHeightCompensate, distBetwColsCompensate, scene, compensateIncre = 0) {
+          var cardinalDirection = null;
+          if (cardinalSide === 'north') {
+            cardinalDirection = 1;
+          }
+
+          for (var iCol = 1; iCol < numberCol; iCol++) {
+            if (iCol < 3) {
+              scene.remove(columnResult[0])
+            }
+            columnResult = drawOneSideColumns(false, 'lightgoldenrodyellow', heightColumn, heightCapital);
+            scene.add(columnResult[0]); // FÛT
+            scene.add(columnResult[2]); // ECHINE
+            scene.add(columnResult[1]); // ABAQUE
+            if (cardinalDirection == 1 && cardinalSide === 'north') {
+              columnResult[0].position.x = cardinalDirection * iCol*distBetwCols - distBetwCols;
+              columnResult[0].position.y = heightColPosition + podiumHeightCompensate + distBetwColsCompensate + 0.25;
+              columnResult[2].position.x = cardinalDirection * iCol*distBetwCols + compensateIncre;
+              columnResult[2].position.y = heightColPosition-compensatingHeightCol + distBetwCols + podiumHeightCompensate ;
+              columnResult[1].position.x = cardinalDirection * iCol*distBetwCols + compensateIncre;
+              columnResult[1].position.y = heightColPosition-compensatingHeightCol+ distBetwCols + heightCapital + podiumHeightCompensate;
+            }
+
+            if (iCol == numberCol-1) {
+              widthSide = iCol*distBetwCols
+              lengthSide = widthSide
+            }
+          }
+
+          for (var iCol = 1; iCol < numberCol; iCol++) {
+            // scene.remove(columnResult[0]) // FÛT
+            if (iCol < 3) {
+              columnResult = drawOneSideColumns(false, 'lightgoldenrodyellow', heightColumn, heightCapital);
+              scene.add(columnResult[0]) // FÛT
+            }
+            scene.remove(columnResult[2])
+            scene.remove(columnResult[1])
+
+            scene.add(columnResult[2]); // ECHINE
+            scene.add(columnResult[1]); // ABAQUE
+            if (cardinalDirection == 1 && cardinalSide === 'north' && iCol == 1) {
+              columnResult[0].position.x = cardinalDirection * iCol*distBetwCols - compensateIncre - distBetwCols - 0 ;
+              columnResult[0].position.y = heightColPosition + podiumHeightCompensate + distBetwColsCompensate + 0.25;
+              columnResult[2].position.x = cardinalDirection * iCol*distBetwCols + compensateIncre;
+              columnResult[2].position.y = heightColPosition-compensatingHeightCol + distBetwCols + podiumHeightCompensate ;
+              columnResult[1].position.x = cardinalDirection * iCol*distBetwCols + compensateIncre;
+              columnResult[1].position.y = heightColPosition-compensatingHeightCol+ distBetwCols + heightCapital + podiumHeightCompensate;
+            }
+            if (cardinalDirection == 1 && cardinalSide === 'north' && iCol == numberCol-1) {
+              columnResult[0].position.x = cardinalDirection * iCol*distBetwCols - compensateIncre - distBetwCols - 0 ;
+              columnResult[0].position.y = heightColPosition + podiumHeightCompensate + distBetwColsCompensate + 0.25;
+              columnResult[2].position.x = cardinalDirection * iCol*distBetwCols + compensateIncre;
+              columnResult[2].position.y = heightColPosition-compensatingHeightCol + distBetwCols + podiumHeightCompensate ;
+              columnResult[1].position.x = cardinalDirection * iCol*distBetwCols + compensateIncre;
+              columnResult[1].position.y = heightColPosition-compensatingHeightCol+ distBetwCols + heightCapital + podiumHeightCompensate;
+            }
+          }
+
+          return [widthSide, lengthSide];
+      }*/
 
       function drawOneSideColumns(angleRotation = false, color = 'lightgoldenrodyellow', heightColumn = 10, heightCapital = 5, capitalOrder = 'doric')
       {
@@ -280,38 +348,43 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         return box;
       }
 
-      function recreateEntablature(sizeEntablatureLength = 20, sizeEntablatureWidth = 20, architraveHeight = 1.25, doricFriseHeight = 1.25, heightColumn, compensatingCapitalHeight, scene)
+      function createEntablature(sizeEntablatureLength = 20, sizeEntablatureWidth = 20, architraveHeight = 1.25, doricFriseHeight = 1.25, heightColumn, compensatingCapitalHeight, scene)
       {
         entablatureResult = drawEntablature(sizeEntablatureLength, sizeEntablatureWidth, architraveHeight, doricFriseHeight);
         scene.add(entablatureResult);
         entablatureResult.position.z = 0;
         entablatureResult.position.x = widthSide/2;
         entablatureResult.position.y = parseInt(heightColumn) - 1 + compensatingCapitalHeight + doricFriseHeight/2;
-        return entablatureResult
+        return entablatureResult;
       }
 
-      function createDoricFrise(sizeDoricFriseLength = 20, sizeDoricFriseWidth = 20, metopesNumber, triglyphLength = 1, doricFriseHeight = 1.25, compensatingCapitalHeight, thicknessColumn, distBetwCols, heightColumn, widthSide, lengthSide, idFactorRuleNumberColSide, numberColLongSide, distBetwColsCompensate, scene)
+      function createDoricFrise(metopesNumber, triglyphLength = 1, doricFriseHeight = 1.25, compensatingCapitalHeight, thicknessColumn, distBetwCols, heightColumn, widthSide, distBetwColsCompensate, scene, compensateIncre = 0)
       {
+        var compensateLastTriglyph = 3;
         // NORTH
-        doricFriseResult = drawDoricFrise(false, sizeDoricFriseLength, sizeDoricFriseWidth, metopesNumber[0], 1, doricFriseHeight);
-        for (var i = 1; i <= metopesNumber[0]; i++) {
-          scene.add(doricFriseResult[i]);
-          doricFriseResult[i].position.z = 1.25 + distBetwColsCompensate/2; // NOMBRE MAGIQUE ?
+        doricFriseResult = drawDoricFrise(false, metopesNumber, 1, doricFriseHeight);
+        for (var i = 1; i < metopesNumber; i++) {
+          scene.remove(doricTriglyphResult[i])
+          doricTriglyphResult[i] = doricFriseResult[i];
+          doricFriseResult[i].position.z = distBetwColsCompensate/2;
           var totalLengthArchitrave = widthSide + thicknessColumn;
-          if (i <= metopesNumber[0]) {
-            if (i == 1) {
-              doricFriseResult[i].position.x = -thicknessColumn - distBetwColsCompensate/2;
-            } else if (i == metopesNumber[0]) {
-              doricFriseResult[i].position.x = totalLengthArchitrave + distBetwColsCompensate/2;
-            } else {
-              doricFriseResult[i].position.x = distBetwCols/2*i - distBetwCols;
-            }
+          if (i == 2) { // FIRST TRIGLYPH (LEFT)
+            scene.add(doricTriglyphResult[i]);
+            doricFriseResult[i].position.x = 0 - compensateIncre
+          }
+          if (i > 2 && i < metopesNumber) { // MIDDLE TRIGLYPHS
+            scene.add(doricTriglyphResult[i]);
+            doricFriseResult[i].position.x = distBetwCols/2*i - distBetwCols + 0;
+          }
+          if (i == 1) { // LAST TRIGLYPH (RIGHT)
+            scene.add(doricTriglyphResult[i]);
+            doricFriseResult[i].position.x = totalLengthArchitrave + distBetwColsCompensate/2 - compensateLastTriglyph + compensateIncre;
           }
           doricFriseResult[i].position.y = parseInt(heightColumn) + compensatingCapitalHeight;
         }
       }
 
-      function drawDoricFrise(angleRotation = false, sizeDoricFriseLength = 20, sizeDoricFriseWidth = 20, metopesNumber, triglyphLength = 1, doricFriseHeight = 1.25)
+      function drawDoricFrise(angleRotation = false, metopesNumber, triglyphLength = 1, doricFriseHeight = 1.25)
       {
         var box2 = []
         var triglypheModel;
@@ -383,7 +456,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         //////////////////////////////////////////////////////////////////////////////////
         //		Camera Controls							//
         //////////////////////////////////////////////////////////////////////////////////
- /*        var mouse	= {x : 0, y : 0}
+/*         var mouse	= {x : 0, y : 0}
         document.addEventListener('mousemove', function(event){
           mouse.x	= (event.clientX / window.innerWidth ) - 0.5
           mouse.y	= (event.clientY / window.innerHeight) - 0.5
@@ -391,12 +464,24 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         document.addEventListener( 'keydown', (event) => {
             let currKeycode = event.key
             if(currKeycode === 'ArrowLeft') {
-              generate3dTemple(+1)
+              generate3dTemple(+1, 0, 0)
             }
             if(currKeycode === 'ArrowRight') {
-              generate3dTemple(-1)
+              generate3dTemple(-1, 0, 0)
             }
-          });
+            if(currKeycode === 'ArrowUp') {
+              generate3dTemple(0, +1, 0)
+            }
+            if(currKeycode === 'ArrowDown') {
+              generate3dTemple(0, -1, 0)
+            }
+            if(currKeycode === 'PageUp') {
+              generate3dTemple(0, 0, +1)
+            }
+            if(currKeycode === 'PageDown') {
+              generate3dTemple(0, 0, -1)
+            }
+        });
         document.addEventListener( 'mousewheel', (event) => {
             camera.position.z +=event.deltaY/5;
         });
