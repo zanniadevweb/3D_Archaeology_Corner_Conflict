@@ -1,0 +1,466 @@
+<!-- DOC
+https://threejs.org/docs/index.html#manual/en/introduction/Drawing-lines
+https://sbcode.net/threejs/geometry-to-buffergeometry/
+-->
+<html>
+  <head>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/85/three.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  </head>
+
+    <style>
+      body {
+        background-color: #87CEEB;
+        margin: 0px;
+        overflow: hidden;
+      }
+    </style>
+
+    <title>Three.js basic setup</title>
+  </head>
+
+  <body>
+    <div id="textReloadPage" style="display: none"><b>Reload page to create a new 3D scene</b></div>
+
+    <div id="beforeLoadingSceneOptions">
+      Number columns facade : <select id="numberColumnsFacade">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option selected="selected" value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+      </select>
+
+      Rule Number Long Side : <select id="factorRuleNumberColLongSide">
+        <option selected="selected" value="two_n_minus_one">2n - 1</option>
+        <option value="two_n">2n</option>
+        <option value="two_n_plus_one">2n + 1</option>
+      </select>
+
+      Height Podium (m) : <select id="heightPodium">
+        <option selected="selected" value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="13">13</option>
+        <option value="14">14</option>
+        <option value="15">15</option>
+        <option value="16">16</option>
+        <option value="17">17</option>
+        <option value="18">18</option>
+        <option value="19">19</option>
+        <option value="20">20</option>
+      </select>
+
+      Distance Between Columns (m) : <select id="distBetwCols">
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option selected="selected" value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+      </select>
+
+      Height Columns (m) : <select id="heightColumn">
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option selected="selected" value="13">13</option>
+        <option value="14">14</option>
+        <option value="15">15</option>
+        <option value="16">16</option>
+        <option value="17">17</option>
+        <option value="18">18</option>
+        <option value="19">19</option>
+        <option value="20">20</option>
+      </select>
+
+      Colonnaded : <select id="colonnaded">
+        <option selected="selected" value="peripteral">Peripteral</option>
+        <option value="apteral">Apteral</option>
+      </select>
+
+      Type of facade : <select id="facadeType">
+        <option value="apteral_facade">Apteral</option>
+        <option value="in_antis">In Antis</option>
+        <option selected="selected" value="prostyle">Prostyle</option>
+      </select>
+
+      <button onclick="generate3dTemple()">GENERATE 3D TEMPLE</button>
+    </div>
+
+    <script>
+      var iterator = 0;
+      var scene = new THREE.Scene();
+      var entablatureResult = null;
+      setUp(scene);
+      generate3dTemple(0)
+      function generate3dTemple(iterateSign) {
+        if (iterateSign === 0) {
+          iterator = 0;
+        }
+        if (iterateSign === +1) {
+          iterator = iterator + iterateSign;
+        }
+        if (iterateSign === -1) {
+          iterator = iterator + iterateSign;
+        }
+        drawArchitecturalElements(scene, iterator);
+      }
+
+      function calculateHeightAboveZeroYaxis(zeroYaxis, heightValue) {
+        return heightValue - zeroYaxis
+      }
+
+      function drawArchitecturalElements(scene, iterateSign) {
+        var idFactorRuleNumberColSide = document.getElementById('factorRuleNumberColLongSide').value
+        var numberColShortSide = document.getElementById('numberColumnsFacade').value;
+        var heightColumn = document.getElementById('heightColumn').value;
+
+        var podiumResult;
+        var podiumHeight = document.getElementById('heightPodium').value; // TODO : C'est une valeur fixe pour le moment
+        var distBetwCols = parseInt(document.getElementById('distBetwCols').value);
+
+        var podiumHeightCompensate = calculateHeightAboveZeroYaxis(distBetwCols, podiumHeight)
+
+        var thicknessColumn = 2; // TODO : C'est une valeur fixe pour le moment
+        var rangeHeightColumns = [6, 20];
+
+        var compensatingHeightColArray = [null,null,null,null,null,null,2,1,1,0,0,-1,-1,-2,-2,-3,-3,-4,-4,-5,-5];
+        var compensatingHeightCol = 0;
+        compensatingHeightCol = compensatingHeightColArray[heightColumn];
+        var distBetwColsCompensate = - podiumHeightCompensate
+
+        var columnResult = null;
+        var lengthSide = 0;
+        var widthSide = 0;
+
+        var numberColLongSide = 0;
+        var architraveHeight = 1.25
+        var doricFriseHeight = 1.25
+        var heightPodiumPosition = -2.5
+        var heightFrontonPosition = -10
+        var heightColPosition = 0;
+        var heightCapital = 0.75;
+        var compensatingCapitalHeight = 2.75;
+        // var stickyTriglyphDistanceToFriseBlock = 0.1
+
+        heightColPosition = heightColumn - heightPodiumPosition - podiumHeight - architraveHeight - doricFriseHeight + compensatingHeightCol;
+
+        if (idFactorRuleNumberColSide == 'two_n_minus_one') {
+          numberColLongSide = numberColShortSide*2 - 1;
+        } else if (idFactorRuleNumberColSide == 'two_n') {
+          numberColLongSide = numberColShortSide*2;
+        } else if (idFactorRuleNumberColSide == 'two_n_plus_one') {
+          numberColLongSide = numberColShortSide*2 + 1;
+        }
+
+        // FRONT
+        var widthAndLengthSide = createOneSideCol('north', numberColShortSide, false, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital, idFactorRuleNumberColSide, numberColShortSide, numberColLongSide, podiumHeight, podiumHeightCompensate, distBetwColsCompensate, scene);
+        widthSide = widthAndLengthSide[0];
+        lengthSide = widthAndLengthSide[1]
+
+        var shortSideMetopesNumber = (numberColShortSide)*2 + 1;
+        var longSideMetopesNumber = (numberColLongSide)*2 + 1 // TODO
+        var allMetopesNumber = shortSideMetopesNumber*2 + longSideMetopesNumber*2
+        var triglyphLength = 1;
+
+        var friseWidth = distBetwCols*numberColShortSide;
+        var friseLength = distBetwCols*numberColLongSide;
+
+        createDoricFrise(friseWidth, friseLength, [shortSideMetopesNumber, longSideMetopesNumber, allMetopesNumber], triglyphLength, doricFriseHeight, compensatingCapitalHeight, thicknessColumn, distBetwCols, heightColumn, widthSide, lengthSide, idFactorRuleNumberColSide, numberColLongSide, distBetwColsCompensate, scene);
+
+/*        entablatureResult = drawEntablature(friseWidth, thicknessColumn*2, architraveHeight, doricFriseHeight);
+        // scene.add(entablatureResult);
+        // entablatureResult.position.z = 0;
+        entablatureResult.position.x = widthSide/2;
+        entablatureResult.position.y = parseInt(heightColumn) - 1 + compensatingCapitalHeight + doricFriseHeight/2;
+        scene.remove(entablatureResult)*/
+        scene.remove(entablatureResult)
+        entablatureResult = recreateEntablature(friseWidth+iterateSign, thicknessColumn*2, architraveHeight, doricFriseHeight, heightColumn, compensatingCapitalHeight, scene)
+      }
+
+      function createOneSideCol(cardinalSide, numberCol, isLongSide = false, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital, idFactorRuleNumberColSide, numberColShortSide, numberColLongSide, podiumHeight, podiumHeightCompensate, distBetwColsCompensate, scene) {
+          var cardinalDirection = null;
+
+          if (cardinalSide === 'north' || cardinalSide === 'south') {
+            cardinalDirection = 1;
+          } else if (cardinalSide === 'west' || cardinalSide === 'east') {
+            cardinalDirection = -1;
+          }
+
+          for (var iCol = 0; iCol < numberCol; iCol++) {
+            columnResult = drawOneSideColumns(false, 'lightgoldenrodyellow', heightColumn, heightCapital);
+            scene.add(columnResult[0]); // FÛT
+            scene.add(columnResult[2]); // ECHINE
+            scene.add(columnResult[1]); // ABAQUE
+            if (cardinalDirection == 1 && cardinalSide === 'north') {
+              columnResult[0].position.x = cardinalDirection * iCol*distBetwCols;
+              columnResult[0].position.y = heightColPosition + podiumHeightCompensate + distBetwColsCompensate + 0.25;
+              columnResult[2].position.x = cardinalDirection * iCol*distBetwCols;
+              columnResult[2].position.y = heightColPosition-compensatingHeightCol + distBetwCols + podiumHeightCompensate ;
+              columnResult[1].position.x = cardinalDirection * iCol*distBetwCols;
+              columnResult[1].position.y = heightColPosition-compensatingHeightCol+ distBetwCols + heightCapital + podiumHeightCompensate;
+            }
+
+            if (iCol == numberCol-1) {
+              widthSide = iCol*distBetwCols
+              if (idFactorRuleNumberColSide == 'two_n_minus_one') {
+                lengthSide = widthSide
+              } else if (idFactorRuleNumberColSide == 'two_n') {
+                lengthSide = iCol*distBetwCols+distBetwCols/2
+              } else if (idFactorRuleNumberColSide == 'two_n_plus_one') {
+                lengthSide = iCol*distBetwCols+distBetwCols
+              }
+            }
+          }
+
+          return [widthSide, lengthSide];
+      }
+
+      function drawOneSideColumns(angleRotation = false, color = 'lightgoldenrodyellow', heightColumn = 10, heightCapital = 5, capitalOrder = 'doric')
+      {
+        if (capitalOrder === 'doric') {
+          var echinusModel = new THREE.CylinderGeometry( 1.5, heightCapital, 0.75, 12 );
+          var material = new THREE.MeshStandardMaterial({color: 'lightgoldenrodyellow'});
+          var cylinderEchinus = new THREE.Mesh(echinusModel, material);
+
+          var abacusModel = new THREE.BoxGeometry( 3, heightCapital, 3, 12 );
+          var material = new THREE.MeshLambertMaterial({color: 'lightgoldenrodyellow'});
+          var boxAbacus = new THREE.Mesh(abacusModel, material);
+
+          var columnModel = new THREE.CylinderGeometry( 1, 1.25, heightColumn, 12 );
+          const baseTexture = 'https://www.starelstones.co.uk/app/uploads/2023/10/Calacatta-White-Marble-Fluted-Marble-Flute-Tiles.jpg';
+          const loader = new THREE.TextureLoader();
+          var mat = new THREE.MeshPhongMaterial({
+            color: color, 
+            map: loader.load(baseTexture, 
+              function ( texture ) {
+              texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+              texture.offset.set( 0, 0 );
+              texture.repeat.set( 1, 1 ); // Number of time is repeated texture
+            })
+          });
+          var material = [
+              mat,
+              mat,
+              mat,
+              mat,
+              mat,
+              mat,
+          ];
+
+          var cylinder = new THREE.Mesh(columnModel, material);
+
+          return [cylinder, boxAbacus, cylinderEchinus];
+        }
+      }
+
+      // drawArchitrave + drawFriseBlock
+      function drawEntablature(sizeEntablatureLength = 20, sizeEntablatureWidth = 20, architraveHeight = 1.25, doricFriseHeight = 1.25)
+      {
+        var entablatureModel = new THREE.BoxGeometry( sizeEntablatureLength, (architraveHeight + doricFriseHeight), sizeEntablatureWidth, 12 );
+        var material = new THREE.MeshLambertMaterial({color: 'lightgoldenrodyellow'});
+        var box = new THREE.Mesh(entablatureModel, material);
+        return box;
+      }
+
+      function recreateEntablature(sizeEntablatureLength = 20, sizeEntablatureWidth = 20, architraveHeight = 1.25, doricFriseHeight = 1.25, heightColumn, compensatingCapitalHeight, scene)
+      {
+        entablatureResult = drawEntablature(sizeEntablatureLength, sizeEntablatureWidth, architraveHeight, doricFriseHeight);
+        scene.add(entablatureResult);
+        entablatureResult.position.z = 0;
+        entablatureResult.position.x = widthSide/2;
+        entablatureResult.position.y = parseInt(heightColumn) - 1 + compensatingCapitalHeight + doricFriseHeight/2;
+        return entablatureResult
+      }
+
+      function createDoricFrise(sizeDoricFriseLength = 20, sizeDoricFriseWidth = 20, metopesNumber, triglyphLength = 1, doricFriseHeight = 1.25, compensatingCapitalHeight, thicknessColumn, distBetwCols, heightColumn, widthSide, lengthSide, idFactorRuleNumberColSide, numberColLongSide, distBetwColsCompensate, scene)
+      {
+        // NORTH
+        doricFriseResult = drawDoricFrise(false, sizeDoricFriseLength, sizeDoricFriseWidth, metopesNumber[0], 1, doricFriseHeight);
+        for (var i = 1; i <= metopesNumber[0]; i++) {
+          scene.add(doricFriseResult[i]);
+          doricFriseResult[i].position.z = 1.25 + distBetwColsCompensate/2; // NOMBRE MAGIQUE ?
+          var totalLengthArchitrave = widthSide + thicknessColumn;
+          if (i <= metopesNumber[0]) {
+            if (i == 1) {
+              doricFriseResult[i].position.x = -thicknessColumn - distBetwColsCompensate/2;
+            } else if (i == metopesNumber[0]) {
+              doricFriseResult[i].position.x = totalLengthArchitrave + distBetwColsCompensate/2;
+            } else {
+              doricFriseResult[i].position.x = distBetwCols/2*i - distBetwCols;
+            }
+          }
+          doricFriseResult[i].position.y = parseInt(heightColumn) + compensatingCapitalHeight;
+        }
+      }
+
+      function drawDoricFrise(angleRotation = false, sizeDoricFriseLength = 20, sizeDoricFriseWidth = 20, metopesNumber, triglyphLength = 1, doricFriseHeight = 1.25)
+      {
+        var box2 = []
+        var triglypheModel;
+        var material;
+        for (var numCol = 1; numCol <= metopesNumber; numCol++) {
+          triglypheModel = new THREE.BoxGeometry(  triglyphLength, 1.25, triglypheWidth = 0.3, 10 );
+          material = new THREE.MeshLambertMaterial({color: '#00008B'});
+          box2[numCol] = new THREE.Mesh(triglypheModel, material);
+          if (angleRotation == true) {
+            box2[numCol].rotation.z = Math.PI / 2;
+            box2[numCol].rotation.y = Math.PI / 2;
+            box2[numCol].rotation.x = Math.PI / 2;
+          }
+        }
+        return box2;
+      }
+
+      function setUp(scene) {
+        document.getElementById('textReloadPage').style.display = '';
+        document.getElementById('beforeLoadingSceneOptions').style.display = 'none';
+        // create a WebGLRenderer and set its width and height
+        var renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        // add the automatically created canvas element to the page
+        document.body.appendChild( renderer.domElement );
+
+        // create a Scene
+        var onRenderFcts= [];
+        scene.name = 'scene';
+
+        // create a PerspectiveCamera
+        var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10000);
+        camera.position.set( 18, 9, 64 );
+        camera.fov = 30; // ZOOM
+        camera.updateProjectionMatrix();
+        var aspect = window.innerWidth / window.innerHeight;
+        var nearClippingPlane = 0.1;
+        var farClippingPlane = 1000;
+        const width = 30;
+        const height = 30;
+
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		set 3 point lighting						//
+        //////////////////////////////////////////////////////////////////////////////////
+        ;(function()
+        {
+          // add a ambient light
+          var light	= new THREE.AmbientLight( 0x020202 )
+          scene.add( light )
+          // add a light in front
+          var light	= new THREE.DirectionalLight('white', 1)
+          light.position.set(0.5, 0.5, 2)
+          scene.add( light )
+          // add a light behind
+          var light	= new THREE.DirectionalLight('white', 0.75)
+          light.position.set(-0.5, 2.5, -2)
+          scene.add( light )
+        })()
+
+       // scene.add( line );
+
+        const size = 500;
+        const divisions = 25;
+
+        const gridHelper = new THREE.GridHelper( size, divisions );
+        scene.add( gridHelper );
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		Camera Controls							//
+        //////////////////////////////////////////////////////////////////////////////////
+ /*        var mouse	= {x : 0, y : 0}
+        document.addEventListener('mousemove', function(event){
+          mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+          mouse.y	= (event.clientY / window.innerHeight) - 0.5
+        }, false)*/
+        document.addEventListener( 'keydown', (event) => {
+            let currKeycode = event.key
+            if(currKeycode === 'ArrowLeft') {
+              generate3dTemple(+1)
+            }
+            if(currKeycode === 'ArrowRight') {
+              generate3dTemple(-1)
+            }
+          });
+        document.addEventListener( 'mousewheel', (event) => {
+            camera.position.z +=event.deltaY/5;
+        });
+/*        onRenderFcts.push(function(delta, now){
+          camera.position.x += (mouse.x*999 - camera.position.x) * (delta*3)
+          camera.position.y += (mouse.y*999 - camera.position.y + 1) * (delta*3)
+          camera.lookAt( scene.position )
+        })*/
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		render the scene						//
+        //////////////////////////////////////////////////////////////////////////////////
+        onRenderFcts.push(function(){
+          renderer.render( scene, camera );
+        })
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		loop runner							//
+        //////////////////////////////////////////////////////////////////////////////////
+        var lastTimeMsec= null
+        requestAnimationFrame(function animate(nowMsec){
+        // console.log(camera.position);
+
+          // keep looping
+          requestAnimationFrame( animate );
+          // measure time
+          lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+          var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+          lastTimeMsec	= nowMsec
+          // call each update function
+          onRenderFcts.forEach(function(onRenderFct){
+            onRenderFct(deltaMsec/1000, nowMsec/1000)
+          })
+
+/*         document.addEventListener( 'keydown', (event) => {
+          let currKeycode = event.key
+          // right arrow key
+          if(currKeycode === 'ArrowUp') {
+            camera.translateZ(-0.005)
+          }
+          // left arrow key
+          if(currKeycode === 'ArrowLeft') {
+            camera.translateX(-0.005)
+          }
+          // up arrow key
+          if(currKeycode === 'ArrowRight') {
+            camera.translateX(0.005)
+          }
+          // down arrow key
+          if(currKeycode === 'ArrowDown') {
+            camera.translateZ(0.005)
+          }
+          // -------------------
+          if(currKeycode === 'PageUp') {
+            camera.translateY(0.005)
+          }
+          if(currKeycode === 'PageDown') {
+            camera.translateY(-0.005)
+          }
+        });*/
+        })
+      }
+
+    </script>
+  </body>
+
+</html>
