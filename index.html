@@ -125,9 +125,11 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
       var columnResult = [];
       var DistanceBetweenMiddleTriglyph = 0;
       var DistanceEndToMiddleTriglyph = 0;
+      var lengthSide = 0;
+      var widthSide = 0;
       setUp(scene);
-      generate3dTemple(0, 0, 0)
-      function generate3dTemple(iterateSignEntablature, iterateSignLastTriglyphs, iterateSignLastCol, isChangingSizeLastTriglyph = false) {
+      generate3dTemple(0, 0, 0, false, true)
+      function generate3dTemple(iterateSignEntablature, iterateSignLastTriglyphs, iterateSignLastCol, isChangingSizeLastTriglyph = false, isFirstTimeCreating = false) {
         if (iterateSignEntablature === 0) {
           // iteratorEntablature = 0;
         }
@@ -152,7 +154,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         if (iterateSignLastCol === -1) {
           iteratorLastCol = iteratorLastCol + iterateSignLastCol;
         }*/
-        drawArchitecturalElements(scene, iteratorEntablature, iteratorLastTriglyphs, iteratorLastCol, isChangingSizeLastTriglyph);
+        drawArchitecturalElements(scene, iteratorEntablature, iteratorLastTriglyphs, iteratorLastCol, isChangingSizeLastTriglyph, isFirstTimeCreating);
       }
 
       function calculateHeightAboveZeroYaxis(zeroYaxis, heightValue) {
@@ -164,7 +166,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         generate3dTemple(0, 0, 0, true);
       }
 
-      function drawArchitecturalElements(scene, iteratorEntablature, iteratorLastTriglyph, iteratorLastCol, isChangingSizeLastTriglyph = false) {
+      function drawArchitecturalElements(scene, iteratorEntablature, iteratorLastTriglyph, iteratorLastCol, isChangingSizeLastTriglyph = false, isFirstTimeCreating = false) {
         var enlargeLastMetopes = document.getElementById('enlargeLastTriglyphs').value;
         var idFactorRuleNumberColSide = document.getElementById('factorRuleNumberColLongSide').value
         var numberColShortSide = document.getElementById('numberColumnsFacade').value;
@@ -183,9 +185,6 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         var compensatingHeightCol = 0;
         compensatingHeightCol = compensatingHeightColArray[heightColumn];
         var distBetwColsCompensate = - podiumHeightCompensate
-
-        var lengthSide = 0;
-        var widthSide = 0;
 
         var numberColLongSide = 0;
         var architraveHeight = 1.25
@@ -208,9 +207,11 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         }
 
         // FRONT
-        var widthAndLengthSide = createOneSideCol('north', numberColShortSide, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital,podiumHeightCompensate, distBetwColsCompensate, scene, iteratorLastCol);
-        widthSide = widthAndLengthSide[0];
-        lengthSide = widthAndLengthSide[1]
+        if (isFirstTimeCreating) {
+          var widthAndLengthSide = createOneSideCol('north', numberColShortSide, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital,podiumHeightCompensate, distBetwColsCompensate, scene, iteratorLastCol);
+          widthSide = widthAndLengthSide[0];
+          lengthSide = widthAndLengthSide[1]
+        }
 
         var shortSideMetopesNumber = (numberColShortSide)*2;
 
