@@ -103,21 +103,26 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
     </div>
     <div id="textReloadPage" style="display: none; padding-left: 10px; padding-top: 10px;">
       <div style="padding-left: 10px; padding-top: 10px;">
-        PROPORTION LAST METOPES : 
+        PROPORTION DERNIERES METOPES : 
         <select id="enlargeLastTriglyphs" onchange="enlargeLastTriglyphs()">
           <option selected="selected" value="single">single</option>
           <option value="double">double</option>
         </select>
       </div>
-      <div style="padding-left: 10px; padding-top: 10px;">MESURE ARCHITRAVE (m) : <div id="architraveMeasurement">?</div></div>
-      <div style="padding-left: 10px; padding-top: 10px;">DISTANCE TRIGLYPHES CENTRAUX (m) : <div id="DistanceBetweenMiddleTriglyph">?</div></div>
-      <div style="padding-left: 10px; padding-top: 10px;">DISTANCE TRIGLYPHE LATERAUX (m) : <div id="DistanceEndToMiddleTriglyph">?</div></div>
+      <div style="padding-left: 10px; padding-top: 5px;">HAUTEUR COLONNE (m) : <div id="columnHeight">?</div></div>
+      <div style="padding-left: 10px; padding-top: 5px;">HAUTEUR ENTABLEMENT (m) : <div id="entablatureHeight">?</div></div>
+      <div style="padding-left: 10px; padding-top: 5px;">LONGUEUR ENTABLEMENT (m) : <div id="architraveMeasurement">?</div></div>
+      <div style="padding-left: 10px; padding-top: 5px;">DISTANCE TRIGLYPHES CENTRAUX (m) : <div id="DistanceBetweenMiddleTriglyph">?</div></div>
+      <div style="padding-left: 10px; padding-top: 5px;">DISTANCE TRIGLYPHE LATERAUX (m) : <div id="DistanceEndToMiddleTriglyph">?</div></div>
+      <div style="padding-left: 10px; padding-top: 5px;">RATIO H. / L. GLOBALE (m) : <div id="ratioGlobal">?</div></div>
+      <div style="padding-left: 10px; padding-top: 5px;">RATIO L. TRIGLYPHES / METOPES CENTRAUX (m) : <div id="ratioTriglyphMetope">?</div></div>
+      <div style="padding-left: 10px; padding-top: 5px;">RACCOURCIS CLAVIER : Longueur entablement (←, →); Mouvement triglyphe (↑, ↓); Longueur triglyphe (▲, ▼)  </div>
     </div>
 
     <script>
       var iteratorEntablature = 0;
       var iteratorLastTriglyphs = 0;
-      var iteratorLastCol = 0;
+      var iteratorLengthMiddleTriglyphs = 0;
       var scene = new THREE.Scene();
       var entablatureResult = null;
       var doricFriseResult = null;
@@ -129,18 +134,12 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
       var widthSide = 0;
       setUp(scene);
       generate3dTemple(0, 0, 0, false, true)
-      function generate3dTemple(iterateSignEntablature, iterateSignLastTriglyphs, iterateSignLastCol, isChangingSizeLastTriglyph = false, isFirstTimeCreating = false) {
-        if (iterateSignEntablature === 0) {
-          // iteratorEntablature = 0;
-        }
+      function generate3dTemple(iterateSignEntablature, iterateSignLastTriglyphs, iterateSignLengthMiddleTriglyphs, isChangingSizeLastTriglyph = false, isFirstTimeCreating = false) {
         if (iterateSignEntablature === +0.25) {
           iteratorEntablature = iteratorEntablature + iterateSignEntablature;
         }
         if (iterateSignEntablature === -0.25) {
           iteratorEntablature = iteratorEntablature + iterateSignEntablature;
-        }
-        if (iterateSignLastTriglyphs === 0) {
-          // iteratorLastTriglyphs = 0;
         }
         if (iterateSignLastTriglyphs === +0.25) {
           iteratorLastTriglyphs = iteratorLastTriglyphs + iterateSignLastTriglyphs;
@@ -148,13 +147,13 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         if (iterateSignLastTriglyphs === -0.25) {
           iteratorLastTriglyphs = iteratorLastTriglyphs + iterateSignLastTriglyphs;
         }
-/*        if (iterateSignLastCol === +1) {
-          iteratorLastCol = iteratorLastCol + iterateSignLastCol;
+        if (iterateSignLengthMiddleTriglyphs === +0.01) {
+          iteratorLengthMiddleTriglyphs = iteratorLengthMiddleTriglyphs + iterateSignLengthMiddleTriglyphs;
         }
-        if (iterateSignLastCol === -1) {
-          iteratorLastCol = iteratorLastCol + iterateSignLastCol;
-        }*/
-        drawArchitecturalElements(scene, iteratorEntablature, iteratorLastTriglyphs, iteratorLastCol, isChangingSizeLastTriglyph, isFirstTimeCreating);
+        if (iterateSignLengthMiddleTriglyphs === -0.01) {
+          iteratorLengthMiddleTriglyphs = iteratorLengthMiddleTriglyphs + iterateSignLengthMiddleTriglyphs;
+        }
+        drawArchitecturalElements(scene, iteratorEntablature, iteratorLastTriglyphs, iteratorLengthMiddleTriglyphs, isChangingSizeLastTriglyph, isFirstTimeCreating);
       }
 
       function calculateHeightAboveZeroYaxis(zeroYaxis, heightValue) {
@@ -166,7 +165,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         generate3dTemple(0, 0, 0, true);
       }
 
-      function drawArchitecturalElements(scene, iteratorEntablature, iteratorLastTriglyph, iteratorLastCol, isChangingSizeLastTriglyph = false, isFirstTimeCreating = false) {
+      function drawArchitecturalElements(scene, iteratorEntablature, iteratorLastTriglyph, iteratorLengthMiddleTriglyphs, isChangingSizeLastTriglyph = false, isFirstTimeCreating = false) {
         var enlargeLastMetopes = document.getElementById('enlargeLastTriglyphs').value;
         var idFactorRuleNumberColSide = document.getElementById('factorRuleNumberColLongSide').value
         var numberColShortSide = document.getElementById('numberColumnsFacade').value;
@@ -208,14 +207,14 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
 
         // FRONT
         if (isFirstTimeCreating) {
-          var widthAndLengthSide = createOneSideCol('north', numberColShortSide, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital,podiumHeightCompensate, distBetwColsCompensate, scene, iteratorLastCol);
+          var widthAndLengthSide = createOneSideCol('north', numberColShortSide, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital,podiumHeightCompensate, distBetwColsCompensate, scene);
           widthSide = widthAndLengthSide[0];
           lengthSide = widthAndLengthSide[1]
         }
 
         var shortSideMetopesNumber = (numberColShortSide)*2;
 
-        var triglyphLength = 1;
+        var triglyphLength = 1 + iteratorLengthMiddleTriglyphs;
         var lastTriglyphLength = triglyphLength
 
         if (enlargeLastMetopes == 'double') {
@@ -232,9 +231,10 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         entablatureResult = createEntablature(avoidNegativeMeasurement(friseWidth+iteratorEntablature, iteratorEntablature), thicknessColumn, architraveHeight, doricFriseHeight, heightColumn, compensatingCapitalHeight, scene)
 
         var realisticProportions = 1.5
-        document.getElementById('architraveMeasurement').innerHTML = Math.round(((avoidNegativeMeasurement(friseWidth+iteratorEntablature))/10)*realisticProportions)
-        document.getElementById('DistanceBetweenMiddleTriglyph').innerHTML = DistanceBetweenMiddleTriglyph/10
-        DistanceEndToMiddleTriglyph = Math.abs(DistanceBetweenMiddleTriglyph+iteratorLastTriglyph)
+        var architraveMeasurement = (((avoidNegativeMeasurement(friseWidth+iteratorEntablature))/10)*realisticProportions).toFixed(2)
+        document.getElementById('architraveMeasurement').innerHTML = architraveMeasurement
+        document.getElementById('DistanceBetweenMiddleTriglyph').innerHTML = DistanceBetweenMiddleTriglyph/10 - iteratorLengthMiddleTriglyphs/10
+        DistanceEndToMiddleTriglyph = Math.abs(DistanceBetweenMiddleTriglyph+iteratorLastTriglyph) - iteratorLengthMiddleTriglyphs
         if (enlargeLastMetopes == 'double') {
           document.getElementById('DistanceEndToMiddleTriglyph').innerHTML = (Math.abs(DistanceEndToMiddleTriglyph/10) - diffDoubleFromSimpleTriglyph/10).toFixed(2)
         } else {
@@ -245,13 +245,53 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         } else {
           document.getElementById('DistanceEndToMiddleTriglyph').style.color = "black"
         }
+
+        var columnHeight = ((heightColumn*1.75)/10).toFixed(2)
+        document.getElementById('columnHeight').innerHTML = columnHeight
+        var entablatureHeight = (((+doricFriseHeight) + (+architraveHeight))*1.4)/10
+        document.getElementById('entablatureHeight').innerHTML = entablatureHeight
+        var columnHeightPlusEntablatureHeight = (+columnHeight) + (+entablatureHeight)
+        var roundedGlobalRatio = (columnHeightPlusEntablatureHeight/architraveMeasurement).toFixed(1);
+        document.getElementById('ratioGlobal').innerHTML = calculateFractionFromFloat(roundedGlobalRatio)
+        var roundedTriglyphMetopeRatio = (triglyphLength/DistanceBetweenMiddleTriglyph).toFixed(1);
+        document.getElementById('ratioTriglyphMetope').innerHTML = calculateFractionFromFloat(roundedTriglyphMetopeRatio)
+
+        if (document.getElementById('ratioTriglyphMetope').innerHTML == document.getElementById('ratioGlobal').innerHTML) {
+          document.getElementById('ratioTriglyphMetope').style.color = "red"
+          document.getElementById('ratioGlobal').style.color = "red"
+        } else {
+          document.getElementById('ratioTriglyphMetope').style.color = "black"
+          document.getElementById('ratioGlobal').style.color = "black"
+        }
+      }
+
+      function calculateFractionFromFloat(ratioLengthWidth)
+      {
+        var gcd = function(a, b) {
+          if (!b) return a;
+          return gcd(b, a % b);
+        };
+
+        var fraction = ratioLengthWidth;
+        var len = fraction.toString().length - 2;
+
+        var denominator = Math.pow(10, len);
+        var numerator = fraction * denominator;
+
+        var divisor = gcd(numerator, denominator);
+
+        numerator /= divisor;
+        denominator /= divisor;
+
+        var normalizedFraction = (Math.floor(numerator) + '/' + Math.floor(denominator));
+        return normalizedFraction;
       }
 
       function avoidNegativeMeasurement(measurement, iterateSign) {
         if (measurement < 0) { return 0} else {return measurement};
       }
 
-      function createOneSideCol(cardinalSide, numberCol, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital, podiumHeightCompensate, distBetwColsCompensate, scene, compensateIncre = 0) {
+      function createOneSideCol(cardinalSide, numberCol, distBetwCols, heightColPosition, heightColumn, compensatingHeightCol, heightCapital, podiumHeightCompensate, distBetwColsCompensate, scene) {
           var cardinalDirection = null;
           if (cardinalSide === 'north') {
             cardinalDirection = 1;
@@ -263,11 +303,11 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
             scene.add(columnResult[2]); // ECHINE
             scene.add(columnResult[1]); // ABAQUE
             if (cardinalDirection == 1 && cardinalSide === 'north') {
-              columnResult[0].position.x = cardinalDirection * iCol*distBetwCols //+ compensateIncre;
+              columnResult[0].position.x = cardinalDirection * iCol*distBetwCols;
               columnResult[0].position.y = heightColPosition + podiumHeightCompensate + distBetwColsCompensate + 0.25;
-              columnResult[2].position.x = cardinalDirection * iCol*distBetwCols //+ compensateIncre;
+              columnResult[2].position.x = cardinalDirection * iCol*distBetwCols;
               columnResult[2].position.y = heightColPosition-compensatingHeightCol + distBetwCols + podiumHeightCompensate ;
-              columnResult[1].position.x = cardinalDirection * iCol*distBetwCols //+ compensateIncre;
+              columnResult[1].position.x = cardinalDirection * iCol*distBetwCols;
               columnResult[1].position.y = heightColPosition-compensatingHeightCol+ distBetwCols + heightCapital + podiumHeightCompensate;
             }
 
@@ -414,7 +454,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
 
         // create a PerspectiveCamera
         var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10000);
-        camera.position.set( 18, 9, 64 );
+        camera.position.set( 18, 3, 64 );
         camera.fov = 30; // ZOOM
         camera.updateProjectionMatrix();
         var aspect = window.innerWidth / window.innerHeight;
@@ -472,12 +512,12 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
             if(currKeycode === 'ArrowDown') {
               generate3dTemple(0, -0.25, 0)
             }
-/*            if(currKeycode === 'PageUp') {
-              generate3dTemple(0, 0, +1)
+            if(currKeycode === 'PageUp') {
+              generate3dTemple(0, 0, +0.01)
             }
             if(currKeycode === 'PageDown') {
-              generate3dTemple(0, 0, -1)
-            }*/
+              generate3dTemple(0, 0, -0.01)
+            }
         });
         document.addEventListener( 'mousewheel', (event) => {
             camera.position.z +=event.deltaY/5;
