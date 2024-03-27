@@ -117,6 +117,14 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
       <div style="padding-left: 10px; padding-top: 5px;">RATIO H. / L. GLOBALE (m) : <div id="ratioGlobal">?</div></div>
       <div style="padding-left: 10px; padding-top: 5px;">RATIO L. TRIGLYPHES / METOPES CENTRAUX (m) : <div id="ratioTriglyphMetope">?</div></div>
       <div style="padding-left: 10px; padding-top: 5px;">RACCOURCIS CLAVIER : Longueur entablement (←, →); Mouvement triglyphe (↑, ↓); Longueur triglyphe (▲, ▼); Mouvement Entraxe (+, -) </div>
+      <button onclick="keyArrowLeft()">←</button>
+      <button onclick="keyArrowRight()">→</button>
+      <button onclick="keyArrowUp()">↑</button>
+      <button onclick="keyArrowDown()">↓</button>
+      <button onclick="keyPageUp()">▲</button>
+      <button onclick="keyPageDown()">▼</button>
+      <button onclick="keyPlus()">+</button>
+      <button onclick="keyMinus()">-</button>
     </div>
 
     <script>
@@ -581,28 +589,28 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
             let currKeycode = event.key
             // console.log(currKeycode)
             if(currKeycode === 'ArrowLeft') {
-              generate3dTemple(+0.25, 0, 0, false, false, 0)
+              keyArrowLeft();
             }
             if(currKeycode === 'ArrowRight') {
-              generate3dTemple(-0.25, 0, 0, false, false, 0)
+              keyArrowRight();
             }
             if(currKeycode === 'ArrowUp') {
-              generate3dTemple(0, +0.25, 0, false, false, 0)
+              keyArrowUp();
             }
             if(currKeycode === 'ArrowDown') {
-              generate3dTemple(0, -0.25, 0, false, false, 0)
+              keyArrowDown();
             }
             if(currKeycode === 'PageUp') {
-              generate3dTemple(0, 0, +0.01, false, false, 0)
+              keyPageUp();
             }
             if(currKeycode === 'PageDown') {
-              generate3dTemple(0, 0, -0.01, false, false, 0)
+              keyPageDown();
             }
             if(currKeycode === '+') {
-              generate3dTemple(0, 0, 0, false, false, +0.25)
+              keyPlus();
             }
             if(currKeycode === '-') {
-              generate3dTemple(0, 0, 0, false, false, -0.25)
+              keyMinus();
             }
         });
         document.addEventListener( 'mousewheel', (event) => {
@@ -668,6 +676,30 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         })
       }
 
+      function keyArrowLeft() {
+        generate3dTemple(+0.25, 0, 0, false, false, 0)
+      }
+      function keyArrowRight() {
+        generate3dTemple(-0.25, 0, 0, false, false, 0)
+      }
+      function keyArrowUp() {
+        generate3dTemple(0, +0.25, 0, false, false, 0)
+      }
+      function keyArrowDown() {
+        generate3dTemple(0, -0.25, 0, false, false, 0)
+      }
+      function keyPageUp() {
+        generate3dTemple(0, 0, +0.01, false, false, 0)
+      }
+      function keyPageDown() {
+        generate3dTemple(0, 0, -0.01, false, false, 0)
+      }
+      function keyPlus() {
+        generate3dTemple(0, 0, 0, false, false, +0.25)
+      }
+      function keyMinus() {
+        generate3dTemple(0, 0, 0, false, false, -0.25)
+      }
     </script>
   </body>
 
