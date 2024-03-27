@@ -400,15 +400,28 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
           var columnModel = new THREE.CylinderGeometry( 1, 1.25, heightColumn, 12 );
           const baseTexture = 'https://www.starelstones.co.uk/app/uploads/2023/10/Calacatta-White-Marble-Fluted-Marble-Flute-Tiles.jpg';
           const loader = new THREE.TextureLoader();
-          var mat = new THREE.MeshPhongMaterial({
-            color: color, 
-            map: loader.load(baseTexture, 
-              function ( texture ) {
-              texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-              texture.offset.set( 0, 0 );
-              texture.repeat.set( 1, 1 ); // Number of time is repeated texture
-            })
-          });
+          try {
+            var mat = new THREE.MeshPhongMaterial({
+              color: color, 
+              map: loader.load(baseTexture, 
+                function ( texture ) {
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.offset.set( 0, 0 );
+                texture.repeat.set( 1, 1 ); // Number of time is repeated texture
+              })
+            });
+          } catch {
+            var mat = new THREE.MeshPhongMaterial({
+              color: color, 
+              map: loader.load('./fluting.jpg', 
+                function ( texture ) {
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.offset.set( 0, 0 );
+                texture.repeat.set( 1, 1 ); // Number of time is repeated texture
+              })
+            });
+          }
+
           var material = [
               mat,
               mat,
