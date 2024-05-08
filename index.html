@@ -62,9 +62,9 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
       </select>
 
       Distance Between Columns (m) : <select id="distBetwCols">
-        <option value="5">5</option>
+        <option selected="selected" value="5">5</option>
         <option value="6">6</option>
-        <option selected="selected" value="7">7</option>
+        <option value="7">7</option>
         <option value="8">8</option>
         <option value="9">9</option>
         <option value="10">10</option>
@@ -203,7 +203,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         var compensatingHeightColArray = [null,null,null,null,null,null,2,1,1,0,0,-1,-1,-2,-2,-3,-3,-4,-4,-5,-5];
         var compensatingHeightCol = 0;
         compensatingHeightCol = compensatingHeightColArray[heightColumn];
-        var distBetwColsCompensate = - podiumHeightCompensate
+        var distBetwColsCompensate = - podiumHeightCompensate + 2 // TODO : valeur fixe qui dépend de l'entraxe
 
         var numberColLongSide = 0;
         var architraveHeight = 1.25
@@ -250,11 +250,13 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         createDoricFrise(shortSideMetopesNumber, triglyphLength, doricFriseHeight, compensatingCapitalHeight, thicknessColumn, distBetwCols, heightColumn, widthSide,distBetwColsCompensate, scene, 0+iteratorLastTriglyphs, lastTriglyphLength);
 
         scene.remove(entablatureResult)
-        entablatureResult = createEntablature(avoidNegativeMeasurement(friseWidth+iteratorEntablature, iteratorEntablature), thicknessColumn, architraveHeight, doricFriseHeight, heightColumn, compensatingCapitalHeight, scene)
+        var entablatureLength = friseWidth+iteratorEntablature+2
+        entablatureResult = createEntablature(avoidNegativeMeasurement(entablatureLength, iteratorEntablature), thicknessColumn, architraveHeight, doricFriseHeight, heightColumn, compensatingCapitalHeight, scene)
 
         var realisticProportions = 1.5
-        var architraveMeasurement = (((avoidNegativeMeasurement(friseWidth+iteratorEntablature))/10)*realisticProportions).toFixed(2)
+        var architraveMeasurement = (((avoidNegativeMeasurement(entablatureLength))/10)*realisticProportions).toFixed(2)
         document.getElementById('architraveMeasurement').innerHTML = architraveMeasurement
+        var DistBetMidTrig = DistanceBetweenMiddleTriglyph/10 - iteratorLengthMiddleTriglyphs/10
         document.getElementById('DistanceBetweenMiddleTriglyph').innerHTML = DistanceBetweenMiddleTriglyph/10 - iteratorLengthMiddleTriglyphs/10
         DistanceEndToMiddleTriglyph = Math.abs(DistanceBetweenMiddleTriglyph+iteratorLastTriglyph) - iteratorLengthMiddleTriglyphs
         if (enlargeLastMetopes == 'double') {
@@ -275,7 +277,9 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         var columnHeightPlusEntablatureHeight = (+columnHeight) + (+entablatureHeight)
         var roundedGlobalRatio = (columnHeightPlusEntablatureHeight/architraveMeasurement).toFixed(1);
         document.getElementById('ratioGlobal').innerHTML = calculateFractionFromFloat(roundedGlobalRatio)
-        var roundedTriglyphMetopeRatio = (triglyphLength/DistanceBetweenMiddleTriglyph).toFixed(1);
+        var t = triglyphLength/10
+        var unroundedTriglyphMetopeRatio = t/(DistBetMidTrig - t)
+        var roundedTriglyphMetopeRatio = unroundedTriglyphMetopeRatio.toFixed(1);
         document.getElementById('ratioTriglyphMetope').innerHTML = calculateFractionFromFloat(roundedTriglyphMetopeRatio)
 
         if (document.getElementById('ratioTriglyphMetope').innerHTML == document.getElementById('ratioGlobal').innerHTML) {
@@ -323,7 +327,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
             columnResult = drawOneSideColumns(false, 'lightgoldenrodyellow', heightColumn, heightCapital);
 
             // ************* SPECIAL CONDITION : We want to control outsiders columns positions from another function call **************************
-            var compensateColPositionToCenterItThoughNumberColIsReduced = 7;
+            var compensateColPositionToCenterItThoughNumberColIsReduced = 5; // TODO : Dépend de la valeur fixe pour l'entraxe
             // ************* We are only modifying render because we don't want to change width and length returned from current function ***********
             if ( iCol < numberCol - 2 ) { 
               scene.add(columnResult[0]); // FÛT
@@ -355,7 +359,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
             cardinalDirection = 1;
           }
 
-            columnResultSingleCol = drawOneSideColumns(false, 'lightgoldenrodyellow', heightColumn, heightCapital);
+            columnResultSingleCol = drawOneSideColumns(false, 'lightgoldenrodyellow', heightColumn- 1, heightCapital);
             if (positionSide == 'left') {
               columnResultSingleColLeft = columnResultSingleCol
               var colResultLeftOrRight = columnResultSingleColLeft
@@ -374,10 +378,10 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
             colResultSingleColTmpLeftOrRight[1] = colResultLeftOrRight[1]; // ABAQUE
 
             if (positionSide == 'left') {
-              var compensateSingleColPositionFromCenter = - 7;
+              var compensateSingleColPositionFromCenter = - 5; // TODO : Dépend de la valeur fixe pour l'entraxe
             }
             if (positionSide == 'right') {
-              var compensateSingleColPositionFromCenter = + 28;
+              var compensateSingleColPositionFromCenter = + 20; // TODO : Dépend de la valeur fixe pour l'entraxe
             }
 
             scene.add(colResultSingleColTmpLeftOrRight[0]); // FÛT
@@ -386,7 +390,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
 
             if (cardinalDirection == 1 && cardinalSide === 'north') {
               colResultLeftOrRight[0].position.x = cardinalDirection * distBetwCols + compensateSingleColPositionFromCenter + compensatingPositionLastCol;
-              colResultLeftOrRight[0].position.y = heightColPosition + podiumHeightCompensate + distBetwColsCompensate + 0.25;
+              colResultLeftOrRight[0].position.y = heightColPosition + podiumHeightCompensate + distBetwColsCompensate - 0.26;
               colResultLeftOrRight[2].position.x = cardinalDirection * distBetwCols + compensateSingleColPositionFromCenter + compensatingPositionLastCol;
               colResultLeftOrRight[2].position.y = heightColPosition-compensatingHeightCol + distBetwCols + podiumHeightCompensate ;
               colResultLeftOrRight[1].position.x = cardinalDirection * distBetwCols + compensateSingleColPositionFromCenter + compensatingPositionLastCol;
@@ -408,27 +412,9 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
           var columnModel = new THREE.CylinderGeometry( 1, 1.25, heightColumn, 12 );
           const baseTexture = 'https://www.starelstones.co.uk/app/uploads/2023/10/Calacatta-White-Marble-Fluted-Marble-Flute-Tiles.jpg';
           const loader = new THREE.TextureLoader();
-          try {
             var mat = new THREE.MeshPhongMaterial({
-              color: color, 
-              map: loader.load(baseTexture, 
-                function ( texture ) {
-                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                texture.offset.set( 0, 0 );
-                texture.repeat.set( 1, 1 ); // Number of time is repeated texture
-              })
+              color: color
             });
-          } catch {
-            var mat = new THREE.MeshPhongMaterial({
-              color: color, 
-              map: loader.load('./fluting.jpg', 
-                function ( texture ) {
-                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                texture.offset.set( 0, 0 );
-                texture.repeat.set( 1, 1 ); // Number of time is repeated texture
-              })
-            });
-          }
 
           var material = [
               mat,
