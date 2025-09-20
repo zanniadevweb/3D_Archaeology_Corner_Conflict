@@ -14,7 +14,203 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
       body {
         background-color: #87CEEB;
         margin: 0px;
+        padding: 0px;
+        font-family: Arial, sans-serif;
+        overflow-x: hidden;
+      }
+
+      #app-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        position: relative;
+      }
+
+      #controls-container {
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        z-index: 100;
+        position: relative;
+        overflow-y: auto;
+        max-height: 40vh;
+      }
+
+      #canvas-container {
+        flex: 1;
+        position: relative;
+        min-height: 60vh;
         overflow: hidden;
+      }
+
+      #canvas-container canvas {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      .control-group {
+        display: inline-block;
+        margin: 5px 10px 5px 0;
+        vertical-align: top;
+      }
+
+      .control-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 3px;
+        font-size: 12px;
+      }
+
+      select, button {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        font-size: 12px;
+      }
+
+      button {
+        background-color: #4CAF50;
+        color: white;
+        cursor: pointer;
+        margin: 2px;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      /* Styles pour les informations dynamiques */
+      #textReloadPage {
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+
+      #textReloadPage > div {
+        margin: 5px 0;
+        font-size: 11px;
+      }
+
+      /* Media queries pour mobile */
+      @media screen and (max-width: 768px) {
+        body {
+          font-size: 14px;
+        }
+
+        #controls-container {
+          max-height: 50vh;
+          padding: 8px;
+        }
+
+        #canvas-container {
+          min-height: 50vh;
+        }
+
+        .control-group {
+          display: block;
+          margin: 8px 0;
+          width: 100%;
+        }
+
+        .control-group label {
+          font-size: 14px;
+          margin-bottom: 5px;
+        }
+
+        select, button {
+          width: 100%;
+          padding: 10px;
+          font-size: 16px;
+          box-sizing: border-box;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+          background-position: right 10px center;
+          background-repeat: no-repeat;
+          background-size: 16px;
+          padding-right: 35px;
+        }
+
+        button {
+          margin: 5px 0;
+          background-image: none;
+          padding-right: 10px;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        button:active {
+          background-color: #3d8b40;
+          transform: scale(0.98);
+        }
+
+        #textReloadPage {
+          font-size: 12px;
+        }
+
+        #textReloadPage > div {
+          padding: 8px;
+          border-bottom: 1px solid #eee;
+        }
+
+        /* Boutons de contrôle plus grands sur mobile */
+        #textReloadPage button {
+          width: auto;
+          min-width: 44px;
+          height: 44px;
+          margin: 2px;
+          font-size: 18px;
+          display: inline-block;
+        }
+
+        /* Améliorer l'affichage des données en colonnes sur mobile */
+        #textReloadPage > div:nth-child(n+2):nth-child(-n+8) {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+      }
+
+      @media screen and (max-width: 480px) {
+        #controls-container {
+          max-height: 60vh;
+        }
+
+        #canvas-container {
+          min-height: 40vh;
+        }
+
+        .control-group {
+          margin: 10px 0;
+        }
+
+        select, button {
+          padding: 12px;
+          font-size: 18px;
+        }
+
+        /* Réduire encore plus l'espacement sur les très petits écrans */
+        #textReloadPage button {
+          min-width: 40px;
+          height: 40px;
+          font-size: 16px;
+        }
+      }
+
+      /* Amélioration pour les appareils tactiles */
+      @media (hover: none) and (pointer: coarse) {
+        button, select {
+          padding: 14px;
+          font-size: 18px;
+        }
+        
+        button {
+          min-height: 48px;
+        }
       }
     </style>
 
@@ -22,109 +218,138 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
   </head>
 
   <body>
-    <div id="beforeLoadingSceneOptions">
-      Number columns facade : <select id="numberColumnsFacade">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option selected="selected" value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-      </select>
+    <div id="app-container">
+      <div id="controls-container">
+        <div id="beforeLoadingSceneOptions">
+          <div class="control-group">
+            <label for="numberColumnsFacade">Number columns facade :</label>
+            <select id="numberColumnsFacade">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option selected="selected" value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </div>
 
-      Rule Number Long Side : <select id="factorRuleNumberColLongSide">
-        <option selected="selected" value="two_n_minus_one">2n - 1</option>
-        <option value="two_n">2n</option>
-        <option value="two_n_plus_one">2n + 1</option>
-      </select>
+          <div class="control-group">
+            <label for="factorRuleNumberColLongSide">Rule Number Long Side :</label>
+            <select id="factorRuleNumberColLongSide">
+              <option selected="selected" value="two_n_minus_one">2n - 1</option>
+              <option value="two_n">2n</option>
+              <option value="two_n_plus_one">2n + 1</option>
+            </select>
+          </div>
 
-      Height Podium (m) : <select id="heightPodium">
-        <option selected="selected" value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-        <option value="11">11</option>
-        <option value="12">12</option>
-        <option value="13">13</option>
-        <option value="14">14</option>
-        <option value="15">15</option>
-        <option value="16">16</option>
-        <option value="17">17</option>
-        <option value="18">18</option>
-        <option value="19">19</option>
-        <option value="20">20</option>
-      </select>
+          <div class="control-group">
+            <label for="heightPodium">Height Podium (m) :</label>
+            <select id="heightPodium">
+              <option selected="selected" value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+            </select>
+          </div>
 
-      Distance Between Columns (m) : <select id="distBetwCols">
-        <option selected="selected" value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-      </select>
+          <div class="control-group">
+            <label for="distBetwCols">Distance Between Columns (m) :</label>
+            <select id="distBetwCols">
+              <option value="5">5</option>
+              <option selected="selected" value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </div>
 
-      Height Columns (m) : <select id="heightColumn">
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-        <option value="11">11</option>
-        <option value="12">12</option>
-        <option selected="selected" value="13">13</option>
-        <option value="14">14</option>
-        <option value="15">15</option>
-        <option value="16">16</option>
-        <option value="17">17</option>
-        <option value="18">18</option>
-        <option value="19">19</option>
-        <option value="20">20</option>
-      </select>
+          <div class="control-group">
+            <label for="heightColumn">Height Columns (m) :</label>
+            <select id="heightColumn">
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option selected="selected" value="17">17</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+            </select>
+          </div>
 
-      Colonnaded : <select id="colonnaded">
-        <option selected="selected" value="peripteral">Peripteral</option>
-        <option value="apteral">Apteral</option>
-      </select>
+          <div class="control-group">
+            <label for="colonnaded">Colonnaded :</label>
+            <select id="colonnaded">
+              <option selected="selected" value="peripteral">Peripteral</option>
+              <option value="apteral">Apteral</option>
+            </select>
+          </div>
 
-      Type of facade : <select id="facadeType">
-        <option value="apteral_facade">Apteral</option>
-        <option value="in_antis">In Antis</option>
-        <option selected="selected" value="prostyle">Prostyle</option>
-      </select>
+          <div class="control-group">
+            <label for="facadeType">Type of facade :</label>
+            <select id="facadeType">
+              <option value="apteral_facade">Apteral</option>
+              <option value="in_antis">In Antis</option>
+              <option selected="selected" value="prostyle">Prostyle</option>
+            </select>
+          </div>
 
-      <button onclick="generate3dTemple()">GENERATE 3D TEMPLE</button>
-    </div>
-    <div id="textReloadPage" style="display: none; padding-left: 10px; padding-top: 10px;">
-      <div style="padding-left: 10px; padding-top: 10px;">
-        PROPORTION DERNIERES METOPES : 
-        <select id="enlargeLastTriglyphs" onchange="enlargeLastTriglyphs()">
-          <option selected="selected" value="single">single</option>
-          <option value="double">double</option>
-        </select>
+          <div class="control-group">
+            <button onclick="generate3dTemple()">GENERATE 3D TEMPLE</button>
+          </div>
+        </div>
+        <div id="textReloadPage" style="display: none; padding: 10px;">
+          <div>
+            PROPORTION DERNIERES METOPES : 
+            <select id="enlargeLastTriglyphs" onchange="enlargeLastTriglyphs()">
+              <option selected="selected" value="single">single</option>
+              <option value="double">double</option>
+            </select>
+          </div>
+          <div>HAUTEUR COLONNE (m) : <div id="columnHeight">?</div></div>
+          <div>HAUTEUR ENTABLEMENT (m) : <div id="entablatureHeight">?</div></div>
+          <div>LONGUEUR ENTABLEMENT (m) : <div id="architraveMeasurement">?</div></div>
+          <div>DISTANCE TRIGLYPHES CENTRAUX (m) : <div id="DistanceBetweenMiddleTriglyph">?</div></div>
+          <div>DISTANCE TRIGLYPHE LATERAUX (m) : <div id="DistanceEndToMiddleTriglyph">?</div></div>
+          <div>RATIO H. / L. GLOBALE (m) : <div id="ratioGlobal">?</div></div>
+          <div>RATIO L. TRIGLYPHES / METOPES CENTRAUX (m) : <div id="ratioTriglyphMetope">?</div></div>
+          <div>RACCOURCIS CLAVIER : Longueur entablement (←, →); Mouvement triglyphe (↑, ↓); Longueur triglyphe (▲, ▼); Mouvement Entraxe (+, -) </div>
+          <button onclick="keyArrowLeft()">←</button>
+          <button onclick="keyArrowRight()">→</button>
+          <button onclick="keyArrowUp()">↑</button>
+          <button onclick="keyArrowDown()">↓</button>
+          <button onclick="keyPageUp()">▲</button>
+          <button onclick="keyPageDown()">▼</button>
+          <button onclick="keyPlus()">+</button>
+          <button onclick="keyMinus()">-</button>
+        </div>
       </div>
-      <div style="padding-left: 10px; padding-top: 5px;">HAUTEUR COLONNE (m) : <div id="columnHeight">?</div></div>
-      <div style="padding-left: 10px; padding-top: 5px;">HAUTEUR ENTABLEMENT (m) : <div id="entablatureHeight">?</div></div>
-      <div style="padding-left: 10px; padding-top: 5px;">LONGUEUR ENTABLEMENT (m) : <div id="architraveMeasurement">?</div></div>
-      <div style="padding-left: 10px; padding-top: 5px;">DISTANCE TRIGLYPHES CENTRAUX (m) : <div id="DistanceBetweenMiddleTriglyph">?</div></div>
-      <div style="padding-left: 10px; padding-top: 5px;">DISTANCE TRIGLYPHE LATERAUX (m) : <div id="DistanceEndToMiddleTriglyph">?</div></div>
-      <div style="padding-left: 10px; padding-top: 5px;">RATIO H. / L. GLOBALE (m) : <div id="ratioGlobal">?</div></div>
-      <div style="padding-left: 10px; padding-top: 5px;">RATIO L. TRIGLYPHES / METOPES CENTRAUX (m) : <div id="ratioTriglyphMetope">?</div></div>
-      <div style="padding-left: 10px; padding-top: 5px;">RACCOURCIS CLAVIER : Longueur entablement (←, →); Mouvement triglyphe (↑, ↓); Longueur triglyphe (▲, ▼); Mouvement Entraxe (+, -) </div>
-      <button onclick="keyArrowLeft()">←</button>
-      <button onclick="keyArrowRight()">→</button>
-      <button onclick="keyArrowUp()">↑</button>
-      <button onclick="keyArrowDown()">↓</button>
-      <button onclick="keyPageUp()">▲</button>
-      <button onclick="keyPageDown()">▼</button>
-      <button onclick="keyPlus()">+</button>
-      <button onclick="keyMinus()">-</button>
+      
+      <div id="canvas-container"></div>
     </div>
 
     <script>
@@ -198,12 +423,11 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         var podiumHeightCompensate = calculateHeightAboveZeroYaxis(distBetwCols, podiumHeight)
 
         var thicknessColumn = 2; // TODO : C'est une valeur fixe pour le moment
-        var rangeHeightColumns = [6, 20];
 
         var compensatingHeightColArray = [null,null,null,null,null,null,2,1,1,0,0,-1,-1,-2,-2,-3,-3,-4,-4,-5,-5];
         var compensatingHeightCol = 0;
         compensatingHeightCol = compensatingHeightColArray[heightColumn];
-        var distBetwColsCompensate = - podiumHeightCompensate + 2 // TODO : valeur fixe qui dépend de l'entraxe
+        var distBetwColsCompensate = - podiumHeightCompensate + 1 // TODO : valeur fixe qui dépend de l'entraxe
 
         var numberColLongSide = 0;
         var architraveHeight = 1.25
@@ -253,7 +477,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         var entablatureLength = friseWidth+iteratorEntablature+2
         entablatureResult = createEntablature(avoidNegativeMeasurement(entablatureLength, iteratorEntablature), thicknessColumn, architraveHeight, doricFriseHeight, heightColumn, compensatingCapitalHeight, scene)
 
-        var realisticProportions = 1.5
+        var realisticProportions = 3
         var architraveMeasurement = (((avoidNegativeMeasurement(entablatureLength))/10)*realisticProportions).toFixed(2)
         document.getElementById('architraveMeasurement').innerHTML = architraveMeasurement
         var DistBetMidTrig = DistanceBetweenMiddleTriglyph/10 - iteratorLengthMiddleTriglyphs/10
@@ -270,9 +494,9 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
           document.getElementById('DistanceEndToMiddleTriglyph').style.color = "black"
         }
 
-        var columnHeight = ((heightColumn*1.75)/10).toFixed(2)
+        var columnHeight = ((heightColumn*realisticProportions)/10).toFixed(2)
         document.getElementById('columnHeight').innerHTML = columnHeight
-        var entablatureHeight = (((+doricFriseHeight) + (+architraveHeight))*1.4)/10
+        var entablatureHeight = (((+doricFriseHeight) + (+architraveHeight))*realisticProportions)/10
         document.getElementById('entablatureHeight').innerHTML = entablatureHeight
         var columnHeightPlusEntablatureHeight = (+columnHeight) + (+entablatureHeight)
         var roundedGlobalRatio = (columnHeightPlusEntablatureHeight/architraveMeasurement).toFixed(1);
@@ -280,6 +504,9 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         var t = triglyphLength/10
         var unroundedTriglyphMetopeRatio = t/(DistBetMidTrig - t)
         var roundedTriglyphMetopeRatio = unroundedTriglyphMetopeRatio.toFixed(1);
+        console.log(t)
+        console.log((DistBetMidTrig - t))
+        console.log(unroundedTriglyphMetopeRatio)
         document.getElementById('ratioTriglyphMetope').innerHTML = calculateFractionFromFloat(roundedTriglyphMetopeRatio)
 
         if (document.getElementById('ratioTriglyphMetope').innerHTML == document.getElementById('ratioGlobal').innerHTML) {
@@ -327,7 +554,7 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
             columnResult = drawOneSideColumns(false, 'lightgoldenrodyellow', heightColumn, heightCapital);
 
             // ************* SPECIAL CONDITION : We want to control outsiders columns positions from another function call **************************
-            var compensateColPositionToCenterItThoughNumberColIsReduced = 5; // TODO : Dépend de la valeur fixe pour l'entraxe
+            var compensateColPositionToCenterItThoughNumberColIsReduced = 6; // TODO : Dépend de la valeur fixe pour l'entraxe
             // ************* We are only modifying render because we don't want to change width and length returned from current function ***********
             if ( iCol < numberCol - 2 ) { 
               scene.add(columnResult[0]); // FÛT
@@ -378,10 +605,10 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
             colResultSingleColTmpLeftOrRight[1] = colResultLeftOrRight[1]; // ABAQUE
 
             if (positionSide == 'left') {
-              var compensateSingleColPositionFromCenter = - 5; // TODO : Dépend de la valeur fixe pour l'entraxe
+              var compensateSingleColPositionFromCenter = - 6; // TODO : Dépend de la valeur fixe pour l'entraxe
             }
             if (positionSide == 'right') {
-              var compensateSingleColPositionFromCenter = + 20; // TODO : Dépend de la valeur fixe pour l'entraxe
+              var compensateSingleColPositionFromCenter = + 24; // TODO : Dépend de la valeur fixe pour l'entraxe
             }
 
             scene.add(colResultSingleColTmpLeftOrRight[0]); // FÛT
@@ -412,9 +639,27 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
           var columnModel = new THREE.CylinderGeometry( 1, 1.25, heightColumn, 12 );
           const baseTexture = 'https://www.starelstones.co.uk/app/uploads/2023/10/Calacatta-White-Marble-Fluted-Marble-Flute-Tiles.jpg';
           const loader = new THREE.TextureLoader();
+          try {
             var mat = new THREE.MeshPhongMaterial({
-              color: color
+              color: color, 
+              map: loader.load(baseTexture, 
+                function ( texture ) {
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.offset.set( 0, 0 );
+                texture.repeat.set( 1, 1 ); // Number of time is repeated texture
+              })
             });
+          } catch {
+            var mat = new THREE.MeshPhongMaterial({
+              color: color, 
+              map: loader.load('./fluting.jpg', 
+                function ( texture ) {
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.offset.set( 0, 0 );
+                texture.repeat.set( 1, 1 ); // Number of time is repeated texture
+              })
+            });
+          }
 
           var material = [
               mat,
@@ -515,26 +760,47 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
       function setUp(scene) {
         document.getElementById('textReloadPage').style.display = '';
         document.getElementById('beforeLoadingSceneOptions').style.display = 'none';
+        
+        // Obtenir le conteneur canvas
+        var canvasContainer = document.getElementById('canvas-container');
+        var containerRect = canvasContainer.getBoundingClientRect();
+        
         // create a WebGLRenderer and set its width and height
         var renderer = new THREE.WebGLRenderer({ alpha: true });
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        // add the automatically created canvas element to the page
-        document.body.appendChild( renderer.domElement );
+        renderer.setSize(containerRect.width, containerRect.height);
+        
+        // add the automatically created canvas element to the canvas container
+        canvasContainer.appendChild(renderer.domElement);
 
         // create a Scene
         var onRenderFcts= [];
         scene.name = 'scene';
 
-        // create a PerspectiveCamera
-        var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10000);
-        camera.position.set( 18, 3, 64 );
+        // create a PerspectiveCamera with responsive aspect ratio
+        var camera	= new THREE.PerspectiveCamera(45, containerRect.width / containerRect.height, 0.01, 10000);
+        camera.position.set( 20, 4, 70 );
         camera.fov = 30; // ZOOM
         camera.updateProjectionMatrix();
-        var aspect = window.innerWidth / window.innerHeight;
+        var aspect = containerRect.width / containerRect.height;
         var nearClippingPlane = 0.1;
         var farClippingPlane = 1000;
         const width = 30;
         const height = 30;
+
+        // Fonction de redimensionnement
+        function handleResize() {
+          var containerRect = canvasContainer.getBoundingClientRect();
+          camera.aspect = containerRect.width / containerRect.height;
+          camera.updateProjectionMatrix();
+          renderer.setSize(containerRect.width, containerRect.height);
+        }
+
+        // Event listener pour le redimensionnement
+        window.addEventListener('resize', handleResize);
+        
+        // Variable globale pour le renderer (pour pouvoir y accéder depuis d'autres fonctions)
+        window.globalRenderer = renderer;
+        window.globalCamera = camera;
 
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -612,7 +878,9 @@ https://sbcode.net/threejs/geometry-to-buffergeometry/
         //		render the scene						//
         //////////////////////////////////////////////////////////////////////////////////
         onRenderFcts.push(function(){
-          renderer.render( scene, camera );
+          if (window.globalRenderer && window.globalCamera) {
+            window.globalRenderer.render( scene, window.globalCamera );
+          }
         })
 
         //////////////////////////////////////////////////////////////////////////////////
